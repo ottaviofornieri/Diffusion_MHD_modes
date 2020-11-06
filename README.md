@@ -7,7 +7,8 @@ The spectra of the turbulent fluctuations are modelized as in Yan&Lazarian (2002
 - The Alfvénic turbulence is, on the other hand, anisotropic -- as found in Goldreich&Sridhar (1995) -- which is the reason why these modes are very inefficient in confining particles, or, in other words, why they are subdominant in the calculation of the spatial D(E). They are here considered free of damping.
 
 
-"Github_DiffusionCoefficient_MHD-modes_Halo.ipynb" calculates the D(E) in the Halo region (L_{Halo} = 6 kpc), where fast magnetosonic modes are damped via collisionless processes. 
+"Github_DiffusionCoefficient_MHD-modes_Halo.ipynb" calculates the D(E) in the Halo region (L_{Halo} = 6 kpc), where fast magnetosonic modes are damped via collisionless processes.
+
 "Github_DiffusionCoefficient_MHD-modes_Disk.ipynb" calculates the D(E) in the Warm Ionized Medium (WIM) region (L_{WIM} = 900 pc), where fast magnetosonic modes are damped via both collisionless and collisional (viscous) processes.
 
 
