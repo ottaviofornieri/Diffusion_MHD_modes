@@ -8,9 +8,9 @@ The spectra of the turbulent fluctuations are modelled as in Yan&Lazarian (2002)
 
 
 "Github_DiffusionCoefficient_MHD-modes_Halo.ipynb" is a Jupyter Notebook that calculates the D(E) in the Halo region (L_{Halo} = 6 kpc), where fast magnetosonic modes are damped via collisionless processes. 
-The updated version is called "FinalVersionHalo_Diffusion_coefficient_different_B.ipynb" and allows the explicit control of the plasma parameters that are involved in the calculation.
+The updated version is called "FinalVersionHalo_Diffusion_coefficient_different_B.ipynb" and allows you to explicitly control the plasma parameters that are involved in the calculation.
 
 "Github_DiffusionCoefficient_MHD-modes_Disk.ipynb" is a Jupyter Notebook that calculates the D(E) in the Warm Ionized Medium (WIM) region (L_{WIM} = 900 pc), where fast magnetosonic modes are damped via both collisionless and collisional (viscous) processes.
-As for the halo case, the updated version is called "FinalVersionDisk_Diffusion_coefficient_different_B.ipynb" and allows the explicit control of the plasma parameters that are involved in the calculation.
+As for the halo case, the updated version is called "FinalVersionDisk_Diffusion_coefficient_different_B.ipynb" and allows you to explicitly control the plasma parameters that are involved in the calculation.
 
 
