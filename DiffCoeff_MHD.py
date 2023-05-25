@@ -261,8 +261,8 @@ plt.show()'''
 ### Calculate the D(R)  #####
 #############################
 
-#case_region = 'halo'
-case_region = 'disk'
+#case_region = 'Halo'
+case_region = 'Disk'
 
     
 # Define the integration variables #
@@ -280,6 +280,9 @@ integralOverX_Gyro = np.zeros( len(cosAlpha) )
 integralOverCsi = np.zeros( (len(R), len(mu_array)) )
 integralOverMu = np.zeros( len(R) )
 
+
+print(f'The D(E) is computed in the {case_region}.')
+print('')
 print(f'xi array: [{cosAlpha[0], cosAlpha[-1]}]')
 print(f'mu array: [{mu_array[0], mu_array[-1]}]')
 print('')
@@ -292,11 +295,11 @@ for indx_R, r in enumerate(tqdm(R)):
         for indx_csi, csi in enumerate(cosAlpha):
             
 
-            if case_region == 'halo':
+            if case_region == 'Halo':
                 n_decades = round( np.log10( kmaxL_coll_xi(csi) ) )
                 x_grid = np.logspace(start=0., stop=np.log10( kmaxL_coll_xi(csi) ), num=n_decades*pointsPerDecade)
             
-            elif case_region == 'disk':
+            elif case_region == 'Disk':
                 n_decades = round( np.log10( min( kmaxL_visc_xi(csi), kmaxL_coll_xi(csi) ) ) )
                 x_grid = np.logspace(start=0., stop=np.log10( min( kmaxL_visc_xi(csi), kmaxL_coll_xi(csi) ) ), num=n_decades*pointsPerDecade)
             
@@ -336,6 +339,7 @@ plot_cosmetics_multi()
 plt.loglog(R, integralOverMu, lw=2.5, color='blue')
 plt.xlabel('$ R \equiv r_L \\big/L$',fontsize=20)
 plt.ylabel('$D(E) \, [\mathrm{cm^2 \cdot s^{-1}}]$',fontsize=20)
+plt.text(0.85, 0.05, str(case_region), fontsize=17, transform = plt.gca().transAxes)
 
 
 plt.subplot(1, 2, 2)
@@ -349,5 +353,6 @@ plt.text(0.05, 0.8, '$M_\mathrm{A} = \,$' + str("{:.0f}".format(M_A_disk)), font
 plt.text(0.05, 0.7, '$L_\mathrm{inj} = \,$' + str("{:.0f}".format(L_disk)) + '$\, \mathrm{pc}$', fontsize=17, transform = plt.gca().transAxes)
 plt.text(0.05, 0.6, '$n_\mathrm{ISM} = \,$' + str("{:.1f}".format(n_ISM)) + '$\, \mathrm{cm^{-3}}$', fontsize=17, transform = plt.gca().transAxes)
 plt.text(0.05, 0.5, '$T_\mathrm{ISM} = \,$' + str("{:.0f}".format(T_ISM)) + '$\, \mathrm{K}$', fontsize=17, transform = plt.gca().transAxes)
+plt.text(0.85, 0.05, str(case_region), fontsize=17, transform = plt.gca().transAxes)
 plt.tight_layout()
 plt.show()
