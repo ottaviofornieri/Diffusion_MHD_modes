@@ -83,8 +83,8 @@ B_field = 10.         # magnetic field, in [muGauss]
 n_ISM = 0.1           # density of the environment, in [cm^{-3}]
 T_ISM = 5.e3          # in [K]
 
-L_disk = 10.              # in [pc]
-M_A_disk = 1.             # Alfvenic Mach Number
+L_inj = 10.           # in [pc]
+M_A = 1.              # Alfvenic Mach Number
 
 
 ####
@@ -98,8 +98,8 @@ ln_Lambda = np.log(Debye_length / b_min)
 eta_0 = 6.e3 * (37 / ln_Lambda) * (T_ISM / 1.e8)**(5/2)  # in [g cm^{-1} s^{-1}]
 
 
-x_c = ( (6 * rho * M_A_disk**2 * (L_disk*pc_cm) * v_A) / (eta_0) )**(2/3)
-beta_disk = 3.3 * (3. / B_field)**2 * (n_ISM / 1.) * (T_ISM / 1.e4)
+x_c = ( (6 * rho * M_A**2 * (L_inj*pc_cm) * v_A) / (eta_0) )**(2/3)
+beta_plasma = 3.3 * (3. / B_field)**2 * (n_ISM / 1.) * (T_ISM / 1.e4)
 ####
 
 
@@ -107,7 +107,7 @@ print('rho =', rho, '[g]')
 print('v_A =', v_A / 1.e5, '[km s^{-1}]')
 print('ln_Lambda =', ln_Lambda)
 print('x_c =', x_c)
-print('plasma beta =', beta_disk)
+print('plasma beta =', beta_plasma)
 print('')
 
 
@@ -130,7 +130,7 @@ def LarmorToMomentum(r_L_, B_):
 
 
 ell_inverse = np.logspace(start=1., stop=10., num=700)
-kL_list = [L_disk / ell_inverse[ik] for ik in range(len(ell_inverse))]
+kL_list = [L_inj / ell_inverse[ik] for ik in range(len(ell_inverse))]
 indx_result_100GeV = np.argmin( abs(Larmor_radius(p_CR[indx_p_CR[0]], B_field)[1] - kL_list) )
 indx_result_10TeV = np.argmin( abs(Larmor_radius(p_CR[indx_p_CR[1]], B_field)[1] - kL_list) )
 
@@ -147,20 +147,20 @@ print('')
 import warnings
 warnings.filterwarnings('ignore')
 
-max_kL = L_disk / Larmor_radius(1.e-2, B_field)[1]    # maximum kL, resonating with 10^{-2}GeV CRs
+max_kL = L_inj / Larmor_radius(1.e-2, B_field)[1]    # maximum kL, resonating with 10^{-2}GeV CRs
 
 
 # collisionless
 def kmaxL_coll( alpha_ ):
-    numerator = 4. * M_A_disk**4 * gamma_ratio * ( np.cos( np.radians(alpha_) ) )**2
-    denominator = np.pi * beta_disk * ( np.sin( np.radians(alpha_) ) )**4
-    exp = np.exp( 2. / ( beta_disk * gamma_ratio * ( np.cos( np.radians(alpha_) ) )**2 ) )
+    numerator = 4. * M_A**4 * gamma_ratio * ( np.cos( np.radians(alpha_) ) )**2
+    denominator = np.pi * beta_plasma * ( np.sin( np.radians(alpha_) ) )**4
+    exp = np.exp( 2. / ( beta_plasma * gamma_ratio * ( np.cos( np.radians(alpha_) ) )**2 ) )
     return numerator / denominator * exp
 
 def kmaxL_coll_xi( cosAlpha_ ):
-    numerator = 4. * M_A_disk**4 * gamma_ratio * ( cosAlpha_ )**2
-    denominator = np.pi * beta_disk * ( 1 - cosAlpha_**2 )**2
-    exp = np.exp( 2. / ( beta_disk * gamma_ratio * ( cosAlpha_ )**2 ) )
+    numerator = 4. * M_A**4 * gamma_ratio * ( cosAlpha_ )**2
+    denominator = np.pi * beta_plasma * ( 1 - cosAlpha_**2 )**2
+    exp = np.exp( 2. / ( beta_plasma * gamma_ratio * ( cosAlpha_ )**2 ) )
     return min(max_kL, numerator / denominator * exp)
 
 
@@ -175,7 +175,7 @@ def kmaxL_visc_xi( cosAlpha_ ):
 
 num_alpha = 700
 alpha = np.linspace(start = 0., stop = 90., num = num_alpha)    # wave pitch-angle in degrees
-cosAlpha = np.linspace(start = 0.1, stop = 1., num = num_alpha)
+cosAlpha = np.linspace(start = 0.01, stop = 1., num = num_alpha)
 
 
 '''plt.figure(figsize=(10.5, 4.5))
@@ -189,7 +189,7 @@ plt.axhline(y=ell_inverse[indx_result_100GeV], ls='--', lw=1.5, color='red')
 plt.axhline(y=ell_inverse[indx_result_10TeV], ls='--', lw=1.5, color='green')
 plt.text(0.4, 0.703, '$k_{\mathrm{max}}L = r_L \\big|_{100 \, \mathrm{GeV}}$', fontsize=15, transform = plt.gca().transAxes)
 plt.text(0.02, 0.366, '$k_{\mathrm{max}}L = r_L \\big|_{10 \, \mathrm{TeV}}$', fontsize=15, transform = plt.gca().transAxes)
-plt.title('Truncation scale, $M_{\mathrm{A}} = \,$' + str(M_A_disk), fontsize=16, loc='center', pad=None)
+plt.title('Truncation scale, $M_{\mathrm{A}} = \,$' + str(M_A), fontsize=16, loc='center', pad=None)
 plt.xlabel('$\\alpha_w$',fontsize=20)
 plt.ylabel('$k_\mathrm{max}L$',fontsize=20)
 plt.yscale('log')
@@ -201,7 +201,7 @@ plot_cosmetics_multi()
 
 plt.plot(cosAlpha, [kmaxL_coll_xi(i) for i in cosAlpha], lw=2.5, color='blue', label='collisionless')
 plt.plot(cosAlpha, [kmaxL_visc_xi(i) for i in cosAlpha], lw=2.5, color='orange', label='viscous')
-plt.title('Truncation scale, $M_{\mathrm{A}} = \,$' + str(M_A_disk), fontsize=16, loc='center', pad=None)
+plt.title('Truncation scale, $M_{\mathrm{A}} = \,$' + str(M_A), fontsize=16, loc='center', pad=None)
 plt.xlabel('$\\xi = \mathrm{cos} \; \\alpha_w$',fontsize=20)
 plt.yscale('log')
 plt.legend(fontsize=16, frameon=False, loc='best')
@@ -214,10 +214,10 @@ plt.tight_layout()'''
 # Resonance functions
 
 def resonance_fast( x_, xi_, mu_, R_, n_ ):
-    factor = L_disk * np.sqrt(np.pi) / ( np.sqrt(2) * x_ * np.abs(xi_) * c_pcSec * np.sqrt( (1 - mu_**2) * M_A_disk ) )
-    exp_n0 = np.exp( - ( mu_ - v_A_pcSec / (xi_ * c_pcSec) )**2 / ( 2 * (1 - mu_**2) * M_A_disk ) )
-    exp_nPlus1 = np.exp( - ( mu_ + 1. / (x_ * xi_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A_disk ) )
-    exp_nMinus1 = np.exp( - ( mu_ - 1. / (x_ * xi_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A_disk ) )
+    factor = L_inj * np.sqrt(np.pi) / ( np.sqrt(2) * x_ * np.abs(xi_) * c_pcSec * np.sqrt( (1 - mu_**2) * M_A ) )
+    exp_n0 = np.exp( - ( mu_ - v_A_pcSec / (xi_ * c_pcSec) )**2 / ( 2 * (1 - mu_**2) * M_A ) )
+    exp_nPlus1 = np.exp( - ( mu_ + 1. / (x_ * xi_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A ) )
+    exp_nMinus1 = np.exp( - ( mu_ - 1. / (x_ * xi_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A ) )
     if n_ == 0:
         return factor * exp_n0
     elif n_ == 1:
@@ -227,10 +227,10 @@ def resonance_fast( x_, xi_, mu_, R_, n_ ):
 
 
 def resonance_alf( x_para_, mu_, R_, n_ ):
-    numerator = L_disk * np.sqrt(np.pi)
-    denominator = np.sqrt(2) * x_para_ * c_pcSec * np.sqrt( (1 - mu_**2) * M_A_disk )
-    exp_nPlus1 = np.exp( - ( mu_ + 1. / (x_para_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A_disk ) )
-    exp_nMinus1 = np.exp( - ( mu_ - 1. / (x_para_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A_disk ) )
+    numerator = L_inj * np.sqrt(np.pi)
+    denominator = np.sqrt(2) * x_para_ * c_pcSec * np.sqrt( (1 - mu_**2) * M_A )
+    exp_nPlus1 = np.exp( - ( mu_ + 1. / (x_para_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A ) )
+    exp_nMinus1 = np.exp( - ( mu_ - 1. / (x_para_ * R_) )**2 / ( 2 * (1 - mu_**2) * M_A ) )
     if n_ == 1:
         return numerator / denominator * exp_nPlus1
     elif n_ == -1:
@@ -241,10 +241,10 @@ def resonance_alf( x_para_, mu_, R_, n_ ):
 # Calculation of the D_mumu
     
 def fast_spectrum_norm( x_ ):
-    return M_A_disk**2 * L_disk**3 / ( 8 * np.pi ) * x_**(-7/2)
+    return M_A**2 * L_inj**3 / ( 8 * np.pi ) * x_**(-7/2)
 
 def factor_FastModes( mu_, R_ ):
-    return ( 4 * np.pi * c_pcSec * (1 - mu_**2) ) / ( L_disk**4 * R_**2 )
+    return ( 4 * np.pi * c_pcSec * (1 - mu_**2) ) / ( L_inj**4 * R_**2 )
 
 def Bessel_arg( R_, x_, xi_, mu_ ):
     return R_ * x_ * np.sqrt(1 - xi_**2) * np.sqrt(1 - mu_**2)
@@ -267,10 +267,10 @@ case_region = 'Disk'
     
 # Define the integration variables #
 length_energy_array = 60
-length_mu_array = 30    
+length_mu_array = 50    
 
 p_CR = np.logspace(start = -1., stop = 5., num = length_energy_array)     # CR momentum, in [GeV/c]
-R = Larmor_radius(p_CR, B_field)[1] / L_disk
+R = Larmor_radius(p_CR, B_field)[1] / L_inj
 mu_array = np.linspace(start = 0., stop = 0.95, num = length_mu_array)    # problems with 0° pitch-angle scattering
 pointsPerDecade = 10                                                      # for the integral over x
 
@@ -283,8 +283,10 @@ integralOverMu = np.zeros( len(R) )
 
 print(f'The D(E) is computed in the {case_region}.')
 print('')
-print(f'xi array: [{cosAlpha[0], cosAlpha[-1]}]')
-print(f'mu array: [{mu_array[0], mu_array[-1]}]')
+print(f'energy points: {len(R)}')
+print(f'number of points/decade in x: {pointsPerDecade}')
+print(f'N_xi = {len(cosAlpha)}, xi array: [{cosAlpha[0]} -> {cosAlpha[-1]}]')
+print(f'N_mu = {len(mu_array)}, mu array: [{mu_array[0]} -> {mu_array[-1]}]')
 print('')
 
 
@@ -321,8 +323,8 @@ for indx_R, r in enumerate(tqdm(R)):
             integralOverX_Gyro[indx_csi] = np.trapz( y = csi**2 * x_grid**2 * besselFunc_squared * resonanceFunc_Gyro * turbSpectrum, x = x_grid, axis=-1 )
             
             
-        integralOverCsi[indx_R, indx_mu] = c_pcSec / L_disk * factor_FastModes(mu, r) * np.trapz( integralOverX_TTD + integralOverX_Gyro, x = cosAlpha, axis=-1 )
-        #integralOverCsi[indx_R, indx_mu] = c_pcSec / L_disk * factor_FastModes(mu, r) * np.trapz( y = integralOverX_TTD, x = cosAlpha, axis=-1 )
+        integralOverCsi[indx_R, indx_mu] = c_pcSec / L_inj * factor_FastModes(mu, r) * np.trapz( integralOverX_TTD + integralOverX_Gyro, x = cosAlpha, axis=-1 )
+        #integralOverCsi[indx_R, indx_mu] = c_pcSec / L_inj * factor_FastModes(mu, r) * np.trapz( y = integralOverX_TTD, x = cosAlpha, axis=-1 )
 
 
 for ir in range( len(R) ):
@@ -345,14 +347,15 @@ plt.text(0.85, 0.05, str(case_region), fontsize=17, transform = plt.gca().transA
 plt.subplot(1, 2, 2)
 plot_cosmetics_multi()
 
-plt.loglog( LarmorToMomentum(R * (L_disk*pc_cm), B_field), integralOverMu, lw=2.5, color='blue')
+plt.loglog( LarmorToMomentum(R * (L_inj*pc_cm), B_field), integralOverMu, lw=2.5, color='blue')
 plt.xlabel('$ E \, [\mathrm{GeV}]$',fontsize=20)
 
 plt.text(0.05, 0.9, '$B = \,$' + str("{:.1f}".format(B_field)) + '$\, \mu \mathrm{G}$', fontsize=17, transform = plt.gca().transAxes)
-plt.text(0.05, 0.8, '$M_\mathrm{A} = \,$' + str("{:.0f}".format(M_A_disk)), fontsize=17, transform = plt.gca().transAxes)
-plt.text(0.05, 0.7, '$L_\mathrm{inj} = \,$' + str("{:.0f}".format(L_disk)) + '$\, \mathrm{pc}$', fontsize=17, transform = plt.gca().transAxes)
+plt.text(0.05, 0.8, '$M_\mathrm{A} = \,$' + str("{:.0f}".format(M_A)), fontsize=17, transform = plt.gca().transAxes)
+plt.text(0.05, 0.7, '$L_\mathrm{inj} = \,$' + str("{:.0f}".format(L_inj)) + '$\, \mathrm{pc}$', fontsize=17, transform = plt.gca().transAxes)
 plt.text(0.05, 0.6, '$n_\mathrm{ISM} = \,$' + str("{:.1f}".format(n_ISM)) + '$\, \mathrm{cm^{-3}}$', fontsize=17, transform = plt.gca().transAxes)
 plt.text(0.05, 0.5, '$T_\mathrm{ISM} = \,$' + str("{:.0f}".format(T_ISM)) + '$\, \mathrm{K}$', fontsize=17, transform = plt.gca().transAxes)
+plt.text(0.05, 0.4, '$\\beta_{\mathrm{plasma}} = \,$' + str("{:.3f}".format(beta_plasma)), fontsize=17, transform = plt.gca().transAxes)
 plt.text(0.85, 0.05, str(case_region), fontsize=17, transform = plt.gca().transAxes)
 plt.tight_layout()
 plt.show()
