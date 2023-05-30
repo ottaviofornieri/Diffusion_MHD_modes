@@ -175,7 +175,7 @@ def kmaxL_visc_xi( cosAlpha_ ):
 
 num_alpha = 700
 alpha = np.linspace(start = 0., stop = 90., num = num_alpha)    # wave pitch-angle in degrees
-cosAlpha = np.linspace(start = 0.01, stop = 1., num = num_alpha)
+cosAlpha = np.linspace(start = 0.1, stop = 1., num = num_alpha)
 
 
 '''plt.figure(figsize=(10.5, 4.5))
@@ -261,8 +261,8 @@ plt.show()'''
 ### Calculate the D(R)  #####
 #############################
 
-#case_region = 'Halo'
-case_region = 'Disk'
+case_region = 'Halo'
+#case_region = 'Disk'
 
     
 # Define the integration variables #
